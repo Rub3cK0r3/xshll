@@ -140,6 +140,30 @@ int changeDirectory(char *args[]) {
   int ret = chdir(*args);
   return ret;
 }
+int handleBuiltIn(char * args[256]){
+    if (strcmp(args[0], "exit") == 0)
+      exit(EXIT_SUCCESS);
+    else if (strcmp(args[0], "cd") == 0) {
+      if (args[1] == NULL) {
+        fprintf(stderr, "shell: se esperaba un argumento para \"cd\"\n");
+      } else {
+        if (chdir(args[1]) != 0) {
+          perror("shell");
+        }
+      }
+      return 0;
+    } else if (strcmp(args[0], "echo") == 0) {
+      //No viene implementada la redireccion
+      for (int i = 1; args[i] != NULL; i++) {
+        printf("%s", args[i]);
+        if (args[i + 1] != NULL)
+          printf(" ");
+      }
+      printf("\n");
+    } else {
+      return 1;
+    }
+}
 
 int main() {
   // We print the ASCII art banner
@@ -164,27 +188,7 @@ int main() {
     if (args[0] == NULL)
       continue;
 
-    if (strcmp(args[0], "exit") == 0)
-      exit(EXIT_SUCCESS);
-    else if (strcmp(args[0], "cd") == 0) {
-      if (args[1] == NULL) {
-        fprintf(stderr, "shell: se esperaba un argumento para \"cd\"\n");
-      } else {
-        if (chdir(args[1]) != 0) {
-          perror("shell");
-        }
-      }
-      continue;
-    } else if (strcmp(args[0], "echo") == 0) {
-      //No viene implementada la redireccion
-      for (int i = 1; args[i] != NULL; i++) {
-        printf("%s", args[i]);
-        if (args[i + 1] != NULL)
-          printf(" ");
-      }
-      printf("\n");
-    } else {
-      
+    if (handleBuiltIn(args) == 1){
       pid_t pid = fork();
       if (pid == 0) {
         execvp(args[0], args);
