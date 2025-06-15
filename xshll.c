@@ -27,13 +27,7 @@
 #include <termios.h>
 #include <unistd.h>
 
-#define LIMIT 256 // max number of tokens for a command
-#define MAX_LINE 1024
-#define MAX_ARGS 64
-#define HOST_NAME_MAX 1
-
-#define completed_task_sign "[+]"
-#define failed_task_sign "[-]"
+#include "xshll.h"
 
 /*
  * A shell reads user input, interprets the commands, and
@@ -89,19 +83,10 @@ void shellPrompt() {
    * returned name is null-terminated.
    *
    * Host names are limited to {HOST_NAME_MAX} bytes.
-   */
-  char hostname[HOST_NAME_MAX + 1];
-  // IF NO ERROR IS ENCOUNTERED, IT SHOULD RETURN 0
-  if (gethostname(hostname, HOST_NAME_MAX + 1) != 0) {
-    perror("Error: gethostname");
-  }
-  /*
    * getlogin()  returns  a  pointer to a string containing the name of the user
    * logged in on the controlling terminal of the process, or a null pointer if
    * this information cannot be determined.
-   */
-  char dir[1024];
-  /*
+  
    * The  getcwd()  function  copies an absolute pathname of the current working
    * directory to the array pointed to by buf, which is of length size.
    * If the length of the absolute pathname of the current working directory,
@@ -109,8 +94,31 @@ void shellPrompt() {
    * returned, and errno is set to ERANGE; an application should check for this
    * error, and allocate a larger buffer if necessary.
    */
-  getcwd(dir, sizeof(dir));
-  printf("%s@%s:%s$ ", getlogin(), hostname, dir);
+    char hostname[HOST_NAME_MAX + 1] = "unknown";
+    if (gethostname(hostname, sizeof(hostname)) != 0) {
+        perror("Error: gethostname");
+    }
+
+    char *username = getlogin();
+    if (!username) {
+        struct passwd *pw = getpwuid(getuid());
+        username = pw ? pw->pw_name : "unknown";
+    }
+
+    char *cwd = getcwd(NULL, 0);  // asignación dinámica segura
+    if (!cwd) {
+        perror("Error: getcwd");
+        cwd = strdup("unknown");
+    }
+
+    // Mostrar ~ si estamos en el HOME
+    const char *home = getenv("HOME");
+    if (home && strstr(cwd, home) == cwd) {
+        printf("%s@%s:~%s$ ", username, hostname, cwd + strlen(home));
+    } else {
+        printf("%s@%s:%s$ ", username, hostname, cwd);
+    }
+    free(cwd);
 }
 
 int changeDirectory(char *args[]) {
