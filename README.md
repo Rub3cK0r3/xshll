@@ -7,9 +7,9 @@ Minimal Unix shell clone written in C.
 ## What is it?
 
 xshll is a barebones command line shell implemented in C.  
-It supports basic command execution with arguments, piping, and simple redirection.  
+It supports basic command execution with arguments and piping.  
 
-Designed to get your hands dirty with process creation, signals, and I/O handling in Unix.
+Designed to get your hands dirty with process creation and signals in Unix.
 
 ---
 
@@ -17,7 +17,6 @@ Designed to get your hands dirty with process creation, signals, and I/O handlin
 
 - Executes commands with arguments  
 - Supports piping (`|`)  
-- Supports basic input/output redirection (`<`, `>`)  
 - Handles simple built-ins like `cd` and `exit`  
 - No job control or advanced shell features  
 
