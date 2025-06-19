@@ -261,10 +261,6 @@ int handleBuiltIn(char **args) {
     }
     return 0;
   } else if (strcmp(args[0], "echo") == 0) {
-    // TODO: No viene implementada la redireccion
-    // la redireccion implicaría manipulacion de ficheros y parsear input
-    // completo para ver en cuando tenemos que sustituir el contenido (>) o
-    // añadir el contenido (>>)
     for (int i = 1; args[i] != NULL; i++) {
       printf("%s", args[i]);
       if (args[i + 1] != NULL)
